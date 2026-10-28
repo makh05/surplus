@@ -25,7 +25,9 @@ Shows your next meal, gym or rest, and tonight's sleep, worked out from your sch
 4. On the Home Screen: press and hold an empty spot → **+** (or **Edit → Add Widget**) → **Scriptable** → pick a size → **Add Widget**.
 5. Press and hold the new widget → **Edit Widget** → **Script: Surplus**. Optional: **Parameter** = your current weight (e.g. `51.7`) to show kg to go.
 
-The widget can't see what you ticked in the app (iPhone keeps app data separate), so it shows the plan, not calories eaten. When your timetable changes, edit `SCHED` at the top of the script in Scriptable.
+The widget can't see what you ticked in the app (iPhone keeps app data separate), so it shows the plan, not calories eaten.
+
+**Updates are automatic.** The script checks this repo about every 6 hours and replaces itself with the newest version. To get an update right away, open Scriptable and tap **Surplus** once. Schedule changes go into `SCHED` in this repo's `widget/surplus-widget.js`, not on the phone, because local edits are overwritten by the next update.
 
 ## Files
 

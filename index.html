@@ -881,11 +881,20 @@ document.getElementById("logo").innerHTML = dotPlusSVG();
 const view = document.getElementById("view");
 const CHECK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
+// Days are kept per night shift (after 19:00 you're eating for the shift that starts after midnight),
+// but the header always shows the real calendar date and names the shift separately.
+const realToday = () => keyOf(new Date());
+function dayCaption(k){
+  const real = realToday();
+  if (k === todayKey() && k !== real)
+    return `${fmtDate(real,{weekday:"short",month:"short",day:"numeric"})} · plan for tonight's ${fmtDate(k,{weekday:"short"})} shift`;
+  return `${fmtDate(k,{weekday:"short",month:"short",day:"numeric"})}${schedOf(k).shift ? " shift" : ""}`;
+}
 function dateBar(label){
   const t = todayKey(), isToday = UI.date === t;
   return `<div class="datebar">
     <button class="iconbtn" data-act="day" data-n="-1" aria-label="Previous day">‹</button>
-    <div class="d-label"><div class="eyebrow">${label}</div><h2>${isToday ? "Today" : esc(fmtDate(UI.date,{weekday:"long"}))}<span class="muted" style="font-size:15px;font-weight:500;font-stretch:100%"> · ${esc(fmtDate(UI.date,isToday ? {weekday:"short",month:"short",day:"numeric"} : {month:"short",day:"numeric"}))} shift</span></h2></div>
+    <div class="d-label"><div class="eyebrow">${label}</div><h2>${isToday ? "Today" : esc(fmtDate(UI.date,{weekday:"long"}))}<span class="muted" style="font-size:15px;font-weight:500;font-stretch:100%">${esc(dayCaption(UI.date))}</span></h2></div>
     ${isToday ? "" : `<button class="pill" data-act="today">Today</button>`}
     <button class="iconbtn" data-act="day" data-n="1" aria-label="Next day">›</button>
   </div>`;
@@ -1211,8 +1220,8 @@ function renderProgress(){
   <section class="card" style="display:grid;gap:12px">
     <div class="row"><div class="eyebrow">Body weight</div><span class="spacer"></span>${eta ? `<span class="note">At this pace: 65 kg in about ${eta} weeks</span>` : `<span class="note">Dotted line = 0.5 kg/week plan</span>`}</div>
     <form class="form" id="wform">
-      <label for="wdate">Date<input id="wdate" type="date" value="${t}" max="${t}"></label>
-      <label for="wkg">Weight (kg)<input id="wkg" type="number" step="0.1" min="30" max="150" inputmode="decimal" placeholder="${cur !== null ? cur.toFixed(1) : "50.0"}" value="${getDay(t).weight ?? ""}"></label>
+      <label for="wdate">Date<input id="wdate" type="date" value="${realToday()}" max="${realToday()}"></label>
+      <label for="wkg">Weight (kg)<input id="wkg" type="number" step="0.1" min="30" max="150" inputmode="decimal" placeholder="${cur !== null ? cur.toFixed(1) : "50.0"}" value="${getDay(realToday()).weight ?? ""}"></label>
       <button class="pill primary" type="submit" style="padding:9px 16px">Log weight</button>
     </form>
     ${weightChart(entries)}
@@ -1271,7 +1280,8 @@ function overviewTiles(){
   for (let i = 1; i <= 7 && !nextGym; i++) { const nk = addDays(t, i), s = sessionOf(nk); if (s) nextGym = [nk, s]; }
   const gymV = sid ? SESSIONS[sid].name : (day.gym || {}).skipped ? "Skipped" : "Rest";
   const gymS = sid ? (p.done === p.total ? "Session done" : `${p.done}/${p.total} sets`) : nextGym ? `Next: ${SESSIONS[nextGym[1]].name}, ${esc(fmtDate(nextGym[0],{weekday:"short"}))}` : "";
-  return `<div class="datebar"><div class="d-label"><div class="eyebrow">${esc(fmtDate(t,{weekday:"long",month:"short",day:"numeric"}))} shift</div><h2>Overview</h2></div></div>
+  const real = realToday();
+  return `<div class="datebar"><div class="d-label"><div class="eyebrow">${esc(fmtDate(real,{weekday:"long",month:"short",day:"numeric"}))}</div><h2>Overview</h2>${t !== real ? `<div class="note" style="margin-top:2px">Showing the plan for tonight's ${esc(fmtDate(t,{weekday:"long"}))} shift</div>` : ""}</div></div>
   <section class="tiles">
     <button class="tile glow" style="--g:var(--cream)" data-act="gotab" data-tab="food">
       <span class="t-v">${fmt(kcal)}</span><span class="t-s">of 3,000 kcal${nm ? ` · next ${timeTag(t, nm[0])}` : kcal >= GOAL_KCAL ? " · done" : ""}</span><span class="t-l">Food</span></button>

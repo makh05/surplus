@@ -3,7 +3,12 @@
 // the same way the Surplus app does it.
 //
 // Your weight (optional): long-press the widget → Edit Widget → Parameter → type it, e.g. 51.7
-// When your timetable changes, edit SCHED below (Tashkent time, same as the app's Week tab).
+//
+// This script updates itself from GitHub (about every 6 hours, or each time you run it in Scriptable),
+// so changes to your schedule or the design arrive on their own. Edits made here on the phone
+// get replaced by the next update: ask for changes in the app's repo instead.
+const SELF_URL = "https://raw.githubusercontent.com/makh05/surplus/main/widget/surplus-widget.js";
+const CHECK_EVERY_H = 6;
 
 const SCHED = {
   1: {shift:["00:00","07:30"], uni:["08:00","11:00"], gym:false},  // Monday
@@ -192,6 +197,26 @@ function header(w, small){
   return h;
 }
 
+// ---------- self-update ----------
+// Downloads the latest script from GitHub and saves it over this one; the next refresh runs the new version.
+// Any failure (offline, GitHub down, odd response) leaves the current script untouched.
+async function selfUpdate(){
+  try {
+    const key = "surplus_widget_checked", last = Keychain.contains(key) ? Number(Keychain.get(key)) : 0;
+    if (config.runsInWidget && Date.now() - last < CHECK_EVERY_H * 3600000) return false;
+    const req = new Request(SELF_URL); req.timeoutInterval = 8;
+    const code = await req.loadString();
+    if (!req.response || req.response.statusCode !== 200 || !code.startsWith("// Surplus widget for Scriptable")) return false;
+    Keychain.set(key, String(Date.now()));
+    const path = module.filename, fm = path.includes("Mobile Documents") ? FileManager.iCloud() : FileManager.local();
+    if (fm.isFileStoredIniCloud(path) && !fm.isFileDownloaded(path)) await fm.downloadFileFromiCloud(path);
+    if (fm.readString(path) === code) return false;
+    fm.writeString(path, code);
+    return true;
+  } catch (e) { return false; }
+}
+const updated = await selfUpdate();
+
 // ---------- widget ----------
 const S = summary(new Date());
 const kg = parseFloat(String(args.widgetParameter || "").replace(",", "."));
@@ -263,6 +288,12 @@ if (fam === "accessoryInline") {
   }
 }
 
+// a fresh update shows on the next refresh; ask iOS for that refresh soon
+if (updated) w.refreshAfterDate = new Date(Date.now() + 60000);
+
 Script.setWidget(w);
-if (!config.runsInWidget) await w.presentMedium();
+if (!config.runsInWidget) {
+  if (updated) { const a = new Alert(); a.title = "Surplus widget updated"; a.message = "The new version shows the next time the widget refreshes."; a.addAction("OK"); await a.present(); }
+  await w.presentMedium();
+}
 Script.complete();
