@@ -148,10 +148,10 @@ const mono = (s, w = "medium") => w === "bold" ? Font.boldMonospacedSystemFont(s
 // the logo: red plus in lit dots, unlit dots faintly visible
 function dotPlus(size){
   const dc = new DrawContext(); dc.size = new Size(size, size); dc.opaque = false; dc.respectScreenScale = true;
-  const step = size / 11;
+  const step = size / 11, mid = size / 2;
   for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
     const on = r >= 1 && r <= 7 && c >= 1 && c <= 7 && ((c >= 3 && c <= 5) || (r >= 3 && r <= 5));
-    const rad = step * (on ? 0.43 : 0.23), cx = (c + 1) * step, cy = (r + 1) * step;
+    const rad = step * (on ? 0.43 : 0.23), cx = mid + (c - 4) * step, cy = mid + (r - 4) * step;
     dc.setFillColor(on ? C.red : C.dim);
     dc.fillEllipse(new Rect(cx - rad, cy - rad, rad * 2, rad * 2));
   }

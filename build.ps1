@@ -41,11 +41,12 @@ function New-Icon([int]$size, [string]$name) {
   $g.Clear([System.Drawing.Color]::FromArgb(255, 11, 11, 13))
   $red = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 255, 59, 48))
   $dim = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 38, 38, 43))
-  $step = $size / 11.0
+  # 9 x 9 dots centred on the icon (dot 4 sits exactly in the middle)
+  $step = $size / 11.0; $mid = $size / 2.0
   for ($r = 0; $r -lt 9; $r++) {
     for ($c = 0; $c -lt 9; $c++) {
       $on = ($r -ge 1 -and $r -le 7 -and $c -ge 1 -and $c -le 7) -and (($c -ge 3 -and $c -le 5) -or ($r -ge 3 -and $r -le 5))
-      $cx = ($c + 1) * $step; $cy = ($r + 1) * $step
+      $cx = $mid + ($c - 4) * $step; $cy = $mid + ($r - 4) * $step
       $rad = if ($on) { $step * 0.43 } else { $step * 0.23 }
       $g.FillEllipse($(if ($on) { $red } else { $dim }), [float]($cx - $rad), [float]($cy - $rad), [float]($rad * 2), [float]($rad * 2))
     }

@@ -1,6 +1,6 @@
 // Keeps Surplus working offline. The page itself is fetched fresh when there's a connection
 // (so updates arrive), and falls back to the saved copy when there isn't.
-const CACHE = "surplus-v1";
+const CACHE = "surplus-v2";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
