@@ -15,9 +15,22 @@ Everything you log is stored **only on that iPhone**, inside the Home Screen app
 - Use **Progress → Backup → Save backup** every week or two and keep the file in Files or iCloud Drive.
 - Deleting the Home Screen app also deletes its data, so save a backup first. **Restore backup** brings it back.
 
+## Home Screen widget (Scriptable)
+
+Shows your next meal, gym or rest, and tonight's sleep, worked out from your schedule. Small, medium, large and Lock Screen sizes.
+
+1. Install **Scriptable** from the App Store (free).
+2. Open **https://raw.githubusercontent.com/makh05/surplus/main/widget/surplus-widget.js** in Safari, tap and hold the text, **Select All**, **Copy**.
+3. In Scriptable tap **+**, paste, tap the title at the top and name it **Surplus**, then **Done**.
+4. On the Home Screen: press and hold an empty spot → **+** (or **Edit → Add Widget**) → **Scriptable** → pick a size → **Add Widget**.
+5. Press and hold the new widget → **Edit Widget** → **Script: Surplus**. Optional: **Parameter** = your current weight (e.g. `51.7`) to show kg to go.
+
+The widget can't see what you ticked in the app (iPhone keeps app data separate), so it shows the plan, not calories eaten. When your timetable changes, edit `SCHED` at the top of the script in Scriptable.
+
 ## Files
 
 - `index.html` – the whole app (one file)
 - `manifest.webmanifest`, `sw.js` – Home Screen install and offline support
 - `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` – the app icon
+- `widget/surplus-widget.js` – the Scriptable widget
 - `build.ps1` – rebuilds `index.html` and the icons from the source page
